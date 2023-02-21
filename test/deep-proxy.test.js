@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest'
-import { deepProxy, proxyAndMonitor } from '../deep-proxy'
+import { deepProxy, proxyMonitor } from '../deep-proxy'
 
 describe('tests for deepProxy functionalities', () => {
   const objToClone = {
@@ -45,7 +45,7 @@ describe('tests for deepProxy functionalities', () => {
   })
 
   test('should create a proxy with a monitor object to inspect access of all properties', () => {
-    const [proxy, accessMonitor] = proxyAndMonitor(objToClone)
+    const [proxy, accessMonitor] = proxyMonitor(objToClone)
 
     const { foo, bar } = proxy
     const { zoo, cat } = bar
@@ -79,7 +79,7 @@ describe('tests for deepProxy functionalities', () => {
         }
       }]
     }
-    const [proxy, accessMonitor] = proxyAndMonitor(objToClone)
+    const [proxy, accessMonitor] = proxyMonitor(objToClone)
 
     const { bar } = proxy
     const [first, second] = bar
