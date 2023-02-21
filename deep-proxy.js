@@ -8,8 +8,9 @@ const defaultMonitorStrategy = (objToMonitor, prop) => {
   if (!objToMonitor[prop]) { objToMonitor[prop] = true }
 }
 
-const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrategy, monitorObj = {} }) => {
+const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrategy }) => {
   const newObj = {}
+  const monitorObj = {}
   const keys = Object.keys(objToProxy)
   const baseHandler = !withMonitor ? handler : buildHandlerWithMonitor(monitorObj)
 
@@ -23,10 +24,9 @@ const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrat
       continue
     }
 
-    const innerHandler = !withMonitor ? handler : buildHandlerWithMonitor()
     const [proxy, monitor] = cloneWithProxy({
       objToProxy: objToProxy[key],
-      handler: innerHandler,
+      handler,
       withMonitor,
       monitorStrategy
     })
