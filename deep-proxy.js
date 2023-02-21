@@ -28,8 +28,7 @@ const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrat
       objToProxy: objToProxy[key],
       handler: innerHandler,
       withMonitor,
-      monitorStrategy,
-      monitorObj: monitorObj[key]
+      monitorStrategy
     })
 
     newObj[key] = proxy
