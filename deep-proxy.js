@@ -4,17 +4,59 @@ const defaultHandler = {
   }
 }
 
-export const deepProxy = (objToProxy, handler = defaultHandler) => {
+const defaultMonitorStrategy = (objToMonitor, prop) => {
+  if (!objToMonitor[prop]) { objToMonitor[prop] = true }
+}
+
+const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrategy, monitorObj = {} }) => {
   const newObj = {}
   const keys = Object.keys(objToProxy)
+  const baseHandler = !withMonitor ? handler : buildHandlerWithMonitor(monitorObj)
 
   for (const key of keys) {
     if (typeof objToProxy[key] !== 'object') {
+      if (withMonitor) {
+        monitorObj[key] = false
+      }
+
       newObj[key] = objToProxy[key]
-    } else {
-      newObj[key] = deepProxy(objToProxy[key], handler)
+      continue
     }
+
+    const innerHandler = !withMonitor ? handler : buildHandlerWithMonitor()
+    const [proxy, monitor] = cloneWithProxy({
+      objToProxy: objToProxy[key],
+      handler: innerHandler,
+      withMonitor,
+      monitorStrategy,
+      monitorObj: monitorObj[key]
+    })
+
+    newObj[key] = proxy
+    monitorObj[key] = monitor
   }
 
-  return new Proxy(newObj, handler)
+  return [new Proxy(newObj, baseHandler), monitorObj]
+}
+
+const buildHandlerWithMonitor = (objToMonitor = {}, strategy = defaultMonitorStrategy) => {
+  return {
+    get: function (target, prop) {
+      strategy(objToMonitor, prop)
+      return target[prop]
+    }
+  }
+}
+
+export const deepProxy = (objToProxy, handler = defaultHandler) => {
+  return cloneWithProxy({ objToProxy, handler })[0]
+}
+
+export const proxyAndMonitor = (objToProxy, strategy = defaultMonitorStrategy) => {
+  return cloneWithProxy({
+    objToProxy,
+    withMonitor: true,
+    handler: defaultHandler,
+    monitorStrategy: strategy
+  })
 }
