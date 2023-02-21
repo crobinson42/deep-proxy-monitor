@@ -44,7 +44,7 @@ describe('tests for deepProxy functionalities', () => {
     expect(zoo).toStrictEqual(objToClone.bar.zoo)
   })
 
-  test.only('should create a proxy with a monitor object to inspect access of all properties', () => {
+  test('should create a proxy with a monitor object to inspect access of all properties', () => {
     const [proxy, accessMonitor] = proxyAndMonitor(objToClone)
 
     const { foo, bar } = proxy
