@@ -62,4 +62,40 @@ describe('tests for deepProxy functionalities', () => {
     expect(cat).toStrictEqual(objToClone.bar.cat)
     expect(miu).toEqual(objToClone.bar.cat.miu)
   })
+
+  test('should create a proxy with a monitor object with arrays support', () => {
+    const objToClone = {
+      foo: 'foo',
+      bar: [{
+        baz: 'baz',
+        zoo: {
+          cat: 'cat'
+        }
+      },
+      {
+        baz: 'baz',
+        zoo: {
+          cat: 'cat'
+        }
+      }]
+    }
+    const [proxy, accessMonitor] = proxyAndMonitor(objToClone)
+
+    const { bar } = proxy
+    const [first, second] = bar
+
+    expect(first.baz).toBe('baz')
+    expect(second.zoo.cat).toBe('cat')
+
+    expect(accessMonitor.foo).toBe(false)
+    expect(accessMonitor.bar[0].baz).toBe(true)
+    expect(accessMonitor.bar[0].zoo.cat).toBe(false)
+    expect(accessMonitor.bar[1].baz).toBe(false)
+    expect(accessMonitor.bar[1].zoo.cat).toBe(true)
+
+    // must be the last expects because the toStrictEquals dive into the entire object
+    // calling all the proxies handlers
+    expect(first).toStrictEqual(objToClone.bar[0])
+    expect(second).toStrictEqual(objToClone.bar[1])
+  })
 })

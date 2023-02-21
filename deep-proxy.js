@@ -24,6 +24,29 @@ const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrat
       continue
     }
 
+    if (objToProxy[key] instanceof Array) {
+      const parent = objToProxy[key]
+
+      for (let index = 0; index < parent.length; index++) {
+        const child = parent[index]
+
+        const [proxy, monitor] = cloneWithProxy({
+          objToProxy: child,
+          handler,
+          withMonitor,
+          monitorStrategy
+        })
+
+        if (!newObj[key]) newObj[key] = []
+        if (!monitorObj[key]) monitorObj[key] = []
+
+        newObj[key].push(proxy)
+        monitorObj[key].push(monitor)
+      }
+
+      continue
+    }
+
     const [proxy, monitor] = cloneWithProxy({
       objToProxy: objToProxy[key],
       handler,
