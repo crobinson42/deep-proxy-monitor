@@ -12,7 +12,7 @@ const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrat
   const newObj = {}
   const monitorObj = {}
   const keys = Object.keys(objToProxy)
-  const baseHandler = !withMonitor ? handler : buildHandlerWithMonitor(monitorObj)
+  const baseHandler = !withMonitor ? handler : buildHandlerWithMonitor(monitorObj, monitorStrategy.strategy)
 
   for (const key of keys) {
     buildProxyAndMonitorObject({
@@ -34,7 +34,7 @@ const buildProxyAndMonitorObject = ({ value, handler, withMonitor, monitorStrate
     newObj[key] = value
 
     if (withMonitor) {
-      monitorObj[key] = false
+      monitorObj[key] = monitorStrategy.defaultValue
     }
     return
   }
@@ -80,11 +80,22 @@ export const deepProxy = (objToProxy, handler = defaultHandler) => {
   return cloneWithProxy({ objToProxy, handler })[0]
 }
 
-export const proxyMonitor = (objToProxy, strategy = defaultMonitorStrategy) => {
+export const proxyMonitor = (objToProxy, monitorStrategy) => {
+  if (typeof monitorStrategy === 'undefined') {
+    monitorStrategy = {
+      strategy: defaultMonitorStrategy,
+      defaultValue: false
+    }
+  }
+
+  if (!(monitorStrategy.strategy instanceof Function)) {
+    throw new Error('Strategy must be a function.')
+  }
+
   return cloneWithProxy({
     objToProxy,
     withMonitor: true,
-    handler: defaultHandler,
-    monitorStrategy: strategy
+    monitorStrategy,
+    handler: defaultHandler
   })
 }

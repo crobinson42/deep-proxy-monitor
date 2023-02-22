@@ -98,4 +98,37 @@ describe('tests for deepProxy functionalities', () => {
     expect(first).toStrictEqual(objToClone.bar[0])
     expect(second).toStrictEqual(objToClone.bar[1])
   })
+
+  test('should create a proxy with a monitor object and custom monitor strategy', () => {
+    const objToClone = {
+      foo: 'foo',
+      bar: [{
+        baz: 'baz',
+        zoo: {
+          cat: 'cat'
+        }
+      }]
+    }
+    const monitorStrategy = {
+      defaultValue: 0,
+      strategy: (objToMonitor, prop) => {
+        if (typeof objToMonitor[prop] === 'number') {
+          ++objToMonitor[prop]
+        }
+      }
+    }
+
+    const [proxy, accessMonitor] = proxyMonitor(objToClone, monitorStrategy)
+
+    const { foo, bar } = proxy
+    const [first] = bar
+
+    expect(foo).toBe('foo')
+    expect(first.zoo.cat).toBe('cat')
+    expect(typeof first.zoo.cat).toBe('string')
+
+    expect(accessMonitor.foo).toBe(1)
+    expect(accessMonitor.bar[0].baz).toBe(0)
+    expect(accessMonitor.bar[0].zoo.cat).toBe(2)
+  })
 })
