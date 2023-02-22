@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest'
-import { deepProxy, proxyMonitor } from '../deep-proxy'
+import { deepProxy, proxyMonitor } from '../deep-proxy-monitor.mjs'
 
 describe('tests for deepProxy functionalities', () => {
   const objToClone = {
