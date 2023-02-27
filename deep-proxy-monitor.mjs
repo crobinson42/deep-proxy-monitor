@@ -30,7 +30,7 @@ const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrat
 }
 
 const buildProxyAndMonitorObject = ({ value, handler, withMonitor, monitorStrategy, newObj, monitorObj, key }) => {
-  if (typeof value !== 'object') {
+  if (value === null || typeof value !== 'object') {
     newObj[key] = value
 
     if (withMonitor) {

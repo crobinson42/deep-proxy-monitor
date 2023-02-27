@@ -131,4 +131,22 @@ describe('tests for deepProxy functionalities', () => {
     expect(accessMonitor.bar[0].baz).toBe(0)
     expect(accessMonitor.bar[0].zoo.cat).toBe(2)
   })
+
+  test('should create a proxy with a monitor object with null or undefined properties', () => {
+    const objToClone = {
+      foo: 'foo',
+      bar: null,
+      baz: undefined
+    }
+    const [proxy, accessMonitor] = proxyMonitor(objToClone)
+
+    const { bar, baz } = proxy
+
+    expect(bar).toBeNull()
+    expect(baz).toBeUndefined()
+
+    expect(accessMonitor.foo).toBe(false)
+    expect(accessMonitor.bar).toBe(true)
+    expect(accessMonitor.baz).toBe(true)
+  })
 })
