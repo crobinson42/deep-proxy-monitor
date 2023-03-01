@@ -1,11 +1,13 @@
 const defaultHandler = {
-  get: function (target, prop) {
+  get: function(target, prop) {
     return target[prop]
-  }
+  },
 }
 
 const defaultMonitorStrategy = (objToMonitor, prop) => {
-  if (!objToMonitor[prop]) { objToMonitor[prop] = true }
+  if (!objToMonitor[prop]) {
+    objToMonitor[prop] = true
+  }
 }
 
 const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrategy }) => {
@@ -22,7 +24,7 @@ const cloneWithProxy = ({ objToProxy, handler, withMonitor = false, monitorStrat
       monitorStrategy,
       newObj,
       monitorObj,
-      key
+      key,
     })
   }
 
@@ -40,16 +42,20 @@ const buildProxyAndMonitorObject = ({ value, handler, withMonitor, monitorStrate
   }
 
   if (value instanceof Array) {
-    for (const child of value) {
+    for (let i = 0; i < value.length; i++) {
       const [proxy, monitor] = cloneWithProxy({
-        objToProxy: child,
+        objToProxy: value[i],
         handler,
         withMonitor,
-        monitorStrategy
+        monitorStrategy,
       })
 
-      if (!newObj[key]) newObj[key] = []
-      if (!monitorObj[key]) monitorObj[key] = []
+      if (!newObj[key]) {
+        newObj[key] = []
+      }
+      if (!monitorObj[key]) {
+        monitorObj[key] = []
+      }
 
       newObj[key].push(proxy)
       monitorObj[key].push(monitor)
@@ -61,7 +67,7 @@ const buildProxyAndMonitorObject = ({ value, handler, withMonitor, monitorStrate
     objToProxy: value,
     handler,
     withMonitor,
-    monitorStrategy
+    monitorStrategy,
   })
   newObj[key] = proxy
   monitorObj[key] = monitor
@@ -69,10 +75,10 @@ const buildProxyAndMonitorObject = ({ value, handler, withMonitor, monitorStrate
 
 const buildHandlerWithMonitor = (objToMonitor = {}, strategy = defaultMonitorStrategy) => {
   return {
-    get: function (target, prop) {
+    get: function(target, prop) {
       strategy(objToMonitor, prop)
       return target[prop]
-    }
+    },
   }
 }
 
@@ -84,7 +90,7 @@ export const proxyMonitor = (objToProxy, monitorStrategy) => {
   if (typeof monitorStrategy === 'undefined') {
     monitorStrategy = {
       strategy: defaultMonitorStrategy,
-      defaultValue: false
+      defaultValue: false,
     }
   }
 
@@ -96,6 +102,6 @@ export const proxyMonitor = (objToProxy, monitorStrategy) => {
     objToProxy,
     withMonitor: true,
     monitorStrategy,
-    handler: defaultHandler
+    handler: defaultHandler,
   })
 }
